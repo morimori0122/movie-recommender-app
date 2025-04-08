@@ -6,6 +6,7 @@ import torch
 import pandas as pd
 import os
 
+
 # モデル定義（学習時と同じ）
 class NCF(torch.nn.Module):
     def __init__(self, num_users, num_movies, embedding_dim=32):
@@ -23,6 +24,7 @@ class NCF(torch.nn.Module):
         x = self.fc2(x)
         return x.squeeze()
 
+
 # FastAPI アプリ初期化
 app = FastAPI()
 app.add_middleware(
@@ -35,26 +37,29 @@ app.add_middleware(
 
 # データとマッピングの準備
 df = pd.read_csv("rating.csv")
-user_id_map = {id: idx for idx, id in enumerate(df['userId'].unique())}
-movie_id_map = {id: idx for idx, id in enumerate(df['movieId'].unique())}
+user_id_map = {id: idx for idx, id in enumerate(df["userId"].unique())}
+movie_id_map = {id: idx for idx, id in enumerate(df["movieId"].unique())}
 
 # モデルロード
 num_users = len(user_id_map)
 num_movies = len(movie_id_map)
 
 model = NCF(num_users, num_movies)
-model.load_state_dict(torch.load("ncf_model.pth", map_location=torch.device('cpu')))
+model.load_state_dict(torch.load("ncf_model.pth", map_location=torch.device("cpu")))
 model.eval()
+
 
 # リクエスト形式（1件）
 class PredictRequest(BaseModel):
     userId: int
     movieId: int
 
+
 # リクエスト形式（複数）
 class PredictManyRequest(BaseModel):
     userId: int
     movieIds: List[int]
+
 
 # 単発予測エンドポイント
 @app.post("/predict")
@@ -70,6 +75,7 @@ def predict_rating(request: PredictRequest):
 
     return {"predicted_rating": round(prediction, 3)}
 
+
 # 一括予測エンドポイント（新機能）
 @app.post("/predict_many")
 def predict_many(data: PredictManyRequest):
@@ -81,10 +87,12 @@ def predict_many(data: PredictManyRequest):
 
     user_idx = torch.tensor([user_id_map[user_id]] * len(movie_ids), dtype=torch.long)
     valid_movie_ids = [mid for mid in movie_ids if mid in movie_id_map]
-    movie_idx = torch.tensor([movie_id_map[mid] for mid in valid_movie_ids], dtype=torch.long)
+    movie_idx = torch.tensor(
+        [movie_id_map[mid] for mid in valid_movie_ids], dtype=torch.long
+    )
 
     with torch.no_grad():
-        predictions = model(user_idx[:len(movie_idx)], movie_idx).tolist()
+        predictions = model(user_idx[: len(movie_idx)], movie_idx).tolist()
 
     return [
         {"movieId": mid, "rating": round(pred, 3)}
