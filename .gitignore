@@ -1,0 +1,25 @@
+# Node.js / frontend
+node_modules/
+**/node_modules/
+**/.next/
+**/.env.local
+
+# Python / ml_api
+__pycache__/
+*.pyc
+*.pkl
+*.pth
+*.log
+
+# .env 全体
+.env
+*.env
+
+# データファイル
+shared/*.csv
+shared/*.csv.gz
+database/*.csv
+database/*.csv.gz
+
+# OS系
+.DS_Store
