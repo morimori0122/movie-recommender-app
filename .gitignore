@@ -23,3 +23,5 @@ database/*.csv.gz
 
 # OS系
 .DS_Store
+
+ml_api/rating.csv
