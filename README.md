@@ -1,5 +1,5 @@
 # Movie Recommender App 
-- A full stack movie recommendation app using React, FastAPI, Postgres SQL, and NCF(ML model)
+- A full stack movie recommendation app using Next.js, Node.js, FastAPI, Postgres SQL, and NCF(ML model)
 
 ## Features
 - Movie search
